@@ -21,6 +21,7 @@ namespace ContractConfigurator.ExpressionParser
         {
             NOT_APPLICABLE,
             SUN,
+            STAR,
             PLANET,
             MOON
         }
@@ -52,6 +53,7 @@ namespace ContractConfigurator.ExpressionParser
             RegisterMethod(new Method<CelestialBody, bool>("HasSurface", cb => cb != null && cb.pqsController != null));
             RegisterMethod(new Method<CelestialBody, bool>("IsHomeWorld", cb => cb != null && cb.isHomeWorld));
             RegisterMethod(new Method<CelestialBody, bool>("IsSun", cb => BodyType(cb) == CelestialBodyType.SUN));
+            RegisterMethod(new Method<CelesialBody, bool>("IsStar," cb => BodyType(cb) == CelestialBodyType.STAR));
             RegisterMethod(new Method<CelestialBody, bool>("IsPlanet", cb => BodyType(cb) == CelestialBodyType.PLANET));
             RegisterMethod(new Method<CelestialBody, bool>("IsMoon", cb => BodyType(cb) == CelestialBodyType.MOON));
             RegisterMethod(new Method<CelestialBody, bool>("IsOrbitalSurveyComplete", cb => cb != null && ResourceScenario.Instance != null &&
@@ -207,7 +209,13 @@ namespace ContractConfigurator.ExpressionParser
             {
                 return CelestialBodyType.SUN;
             }
-
+            
+            // Does it have a LightShifter (does it emit light?)
+            if (cb.scaledBody.GetComponentsInChildren<LightShifter>(true) != null)
+            {
+                return CelestialBodyType.STAR;
+            }
+            
             // Add a special case for barycenters (Sigma binary)
             if (cb.referenceBody == sun || cb.referenceBody.Radius < BARYCENTER_THRESHOLD)
             {
